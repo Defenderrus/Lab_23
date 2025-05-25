@@ -22,7 +22,9 @@ class SegmentFunction {
         ~SegmentFunction();
 
         int GetSize();
-        void print_segments();
+        double GetStart(int index);
+        double GetEnd(int index);
+        void Clear();
 
         void Define(double start, double end, function<T(double)> func);
         bool IsMonotonic() const;
@@ -46,17 +48,26 @@ int SegmentFunction<T>::GetSize() {
 }
 
 template <typename T>
-void SegmentFunction<T>::print_segments() {
-    for (int i = 0; i < segments->GetLength(); i++) {
-        Segment& segment = (*segments)[i];
-        cout << "("+to_string(segment.start)+"; "+to_string(segment.end)+")" << endl;
+double SegmentFunction<T>::GetStart(int index) {
+    return (*segments)[index].start;
+}
+
+template <typename T>
+double SegmentFunction<T>::GetEnd(int index) {
+    return (*segments)[index].end;
+}
+
+template <typename T>
+void SegmentFunction<T>::Clear() {
+    while (segments->GetLength() > 0) {
+        segments->Remove(0);
     }
 }
 
 template <typename T>
 void SegmentFunction<T>::Define(double start, double end, function<T(double)> func) {
     if (start >= end) {
-        throw invalid_argument("Invalid arguments start and end");
+        throw invalid_argument("Неправильные аргументы!");
     }
     bool flag = true;
     int length = segments->GetLength(), counter = 0;
@@ -114,9 +125,9 @@ bool SegmentFunction<T>::IsMonotonic() const {
         Segment& segment = (*segments)[i];
         start = segment.func(segment.start);
         end = segment.func(segment.end);
-        if (prev_x == segment.start) {
-            if (abs(prev_y-start) < 1e-12 && abs(end-start) < 1e-12) {
-                continue;
+        if (abs(prev_x-segment.start) < 1e-6) {
+            if (abs(prev_y-start) < 1e-6 && abs(end-start) < 1e-6) {
+                //
             } else if (prev_y <= start && start <= end && !decrease) {
                 increase = true;
             } else if (prev_y >= start && start >= end && !increase) {
@@ -168,13 +179,13 @@ T SegmentFunction<T>::CalculateAt(double x) const {
             if (x == left_segment.end && i < segments->GetLength()-1) {
                 const Segment& right_segment = (*segments)[i+1];
                 if (x == right_segment.start && left_segment.func(x) != right_segment.func(x)) {
-                    throw "Undefined value, the first kind gap!";
+                    throw domain_error("Критическая точка (разрыв первого рода)");
                 }
             }
             return left_segment.func(x);
         }
     }
-    throw out_of_range("X is out of range!");
+    throw out_of_range("Функция не определена в точке x");
 }
 
 #endif // SEGMENTFUNCTION_HPP

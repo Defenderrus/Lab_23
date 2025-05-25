@@ -70,13 +70,17 @@ inline void test4(void) {
 
 inline void test5(void) {
     SegmentFunction<double> segFunc;
-    segFunc.Define(0.0, 0.5, [](double x) {return x;});
-    segFunc.Define(0.5, 2.5, [](double x) {return 3*x*x;});
-    try {
-        segFunc.CalculateAt(0.5);
-    } catch(const char* error_message) {
-        TEST_PASS_MESSAGE(error_message);
-    }
+    segFunc.Define(0.0, 1.0, [](double x) {return 1;});
+    segFunc.Define(1.0, 2.0, [](double x) {return x;});
+    TEST_ASSERT_TRUE(segFunc.IsContinuous());
+    TEST_ASSERT_TRUE(segFunc.IsMonotonic());
+}
+
+inline void test6(void) {
+    SegmentFunction<double> segFunc;
+    segFunc.Define(3.0, 4.0, [](double x) {return 1/(x-3)+1;});
+    segFunc.Define(2.0, 3.0, [](double x) {return x;});
+    TEST_ASSERT_EQUAL(2, segFunc.GetSize());
 }
 
 inline int run_tests(void) {
@@ -86,6 +90,7 @@ inline int run_tests(void) {
     RUN_TEST(test3);
     RUN_TEST(test4);
     RUN_TEST(test5);
+    RUN_TEST(test6);
     return UNITY_END();
 }
 

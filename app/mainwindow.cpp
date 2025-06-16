@@ -10,6 +10,95 @@ MainWindow::MainWindow(QWidget *parent):
     series(new QLineSeries())
 {
     ui->setupUi(this);
+    setStyleSheet(
+        "QMainWindow {"
+        "   background: #f8fafc;"
+        "   font-family: 'Segoe UI', Arial, sans-serif;"
+        "}"
+        "QGroupBox {"
+        "   border: 1px solid #e2e8f0;"
+        "   border-radius: 10px;"
+        "   margin-top: 15px;"
+        "   padding-top: 15px;"
+        "   background: white;"
+        "}"
+        "QGroupBox::title {"
+        "   subcontrol-origin: margin;"
+        "   left: 10px;"
+        "   padding: 0 4px;"
+        "   color: #a44040;"
+        "   font-weight: 600;"
+        "   font-size: 14px;"
+        "}"
+        "QPushButton {"
+        "   background: white;"
+        "   color: #a44040;"
+        "   border: 1px solid #e2e8f0;"
+        "   padding: 4px 8px;"
+        "   border-radius: 6px;"
+        "   font-weight: 500;"
+        "   transition: all 0.2s ease;"
+        "}"
+        "QPushButton:hover {"
+        "   background: #a44040;"
+        "   color: white;"
+        "   border-color: #a44040;"
+        "}"
+        "QLineEdit, QTextEdit, QComboBox, QSpinBox, QDoubleSpinBox {"
+        "   padding: 4px 6px;"
+        "   border: 1px solid #e2e8f0;"
+        "   border-radius: 6px;"
+        "   background: white;"
+        "   selection-background-color: #a44040;"
+        "   selection-color: white;"
+        "}"
+        "QLineEdit:focus, QTextEdit:focus, QComboBox:focus {"
+        "   border-color: #a44040;"
+        "   outline: none;"
+        "}"
+        "QComboBox::drop-down {"
+        "   border: none;"
+        "   width: 24px;"
+        "}"
+        "QScrollBar:vertical {"
+        "   border: none;"
+        "   background: #f1f5f9;"
+        "   width: 10px;"
+        "   margin: 0;"
+        "}"
+        "QScrollBar::handle:vertical {"
+        "   background: #cbd5e1;"
+        "   min-height: 20px;"
+        "   border-radius: 5px;"
+        "}"
+        "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {"
+        "   border: none;"
+        "   background: none;"
+        "   height: 0;"
+        "}"
+        "QTabWidget::pane {"
+        "   border: 1px solid #e2e8f0;"
+        "   border-radius: 6px;"
+        "   padding: 6px;"
+        "   margin-top: -1px;"
+        "}"
+        "QTabBar::tab {"
+        "   padding: 8px 16px;"
+        "   border: none;"
+        "   color: #64748b;"
+        "}"
+        "QTabBar::tab:selected {"
+        "   color: #a44040;"
+        "   border-bottom: 2px solid #a44040;"
+        "}"
+        "QMessageBox, QInputDialog, QDialog {"
+        "background: #f8fafc;"
+        "font-family: 'Segoe UI', Arial, sans-serif;"
+        "}"
+        "QMessageBox QLabel {"
+        "   color: #334155;"
+        "}"
+    );
     setupChart();
     updateInfo();
 
@@ -38,12 +127,30 @@ void MainWindow::setupChart() {
     chart->axisX()->setRange(-10, 10);
     chart->axisY()->setRange(-10, 10);
 
+    chart->setTitleFont(QFont("Segoe UI", 12, QFont::Bold));
+    chart->setTitleBrush(QBrush(QColor("#1a202c")));
+    chart->setBackgroundBrush(QBrush(QColor("#ffffff")));
+    chart->setBackgroundRoundness(10);
+    chart->setDropShadowEnabled(false);
+
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->setRubberBand(QChartView::RectangleRubberBand);
+    chartView->setStyleSheet(
+        "QChartView {"
+        "   margin-top: 15;"
+        "   border: 1px solid #e2e8f0;"
+        "   border-radius: 10px;"
+        "   background: white;"
+        "   padding: 10px;"
+        "}"
+    );
     QLayoutItem *oldItem = ui->gridLayout_6->takeAt(0);
     if (oldItem) delete oldItem->widget();
     delete oldItem;
     ui->gridLayout_6->addWidget(chartView);
+    chartView->setContentsMargins(5, 5, 5, 5);
+    chart->setAnimationOptions(QChart::AllAnimations);
 }
 
 void MainWindow::updatePlot() {

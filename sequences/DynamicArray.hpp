@@ -79,7 +79,7 @@ int DynamicArray<T>::GetSize() const {
 template <typename T>
 T DynamicArray<T>::Get(int index) const {
     if (index >= this->size || index < 0) {
-        throw out_of_range("The index is out of range!");
+        throw out_of_range("Некорректный индекс!");
     }
     return this->data[index];
 }
@@ -87,7 +87,7 @@ T DynamicArray<T>::Get(int index) const {
 template <typename T>
 T& DynamicArray<T>::operator[](int index) {
     if (index >= this->size || index < 0) {
-        throw out_of_range("The index is out of range!");
+        throw out_of_range("Некорректный индекс!");
     }
     return data[index];
 }
@@ -95,7 +95,7 @@ T& DynamicArray<T>::operator[](int index) {
 template <typename T>
 const T& DynamicArray<T>::operator[](int index) const {
     if (index >= this->size || index < 0) {
-        throw out_of_range("The index is out of range!");
+        throw out_of_range("Некорректный индекс!");
     }
     return data[index];
 }
@@ -104,7 +104,7 @@ const T& DynamicArray<T>::operator[](int index) const {
 template <typename T>
 void DynamicArray<T>::Set(int index, T value) {
     if (index >= this->size || index < 0) {
-        throw out_of_range("The index is out of range!");
+        throw out_of_range("Некорректный индекс!");
     } else {
         this->data[index] = value;
     }

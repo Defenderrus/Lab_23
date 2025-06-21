@@ -1,6 +1,8 @@
 #ifndef SEQUENCE_HPP
 #define SEQUENCE_HPP
 
+#include <utility>
+#include <functional>
 using namespace std;
 
 

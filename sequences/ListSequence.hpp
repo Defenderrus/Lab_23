@@ -36,6 +36,16 @@ class ListSequence: public Sequence<T> {
         Sequence<T>* InsertAt(T item, int index) override;
         Sequence<T>* PutAt(T item, int index) override;
         Sequence<T>* Concat(Sequence<T> *other) override;
+
+        // Дополнительные операции
+        template <typename U>
+        Sequence<U>* Map(function<U(T)> func);
+        Sequence<T>* Where(function<bool(T)> func);
+        T Reduce(function<T(T, T)> func, T start);
+        template <typename U>
+        Sequence<pair<T, U>>* Zip(Sequence<U> *other);
+        template <typename U>
+        static pair<Sequence<T>*, Sequence<U>*> Unzip(Sequence<pair<T, U>> *sequence);
 };
 
 // Создание объекта
@@ -83,7 +93,7 @@ T ListSequence<T>::Get(int index) const {
 template <typename T>
 T& ListSequence<T>::operator[](int index) {
     if (index >= this->list->GetLength() || index < 0) {
-        throw out_of_range("The index is out of range!");
+        throw out_of_range("Некорректный индекс!");
     }
     return (*this->list)[index];
 }
@@ -91,7 +101,7 @@ T& ListSequence<T>::operator[](int index) {
 template <typename T>
 const T& ListSequence<T>::operator[](int index) const {
     if (index >= this->list->GetLength() || index < 0) {
-        throw out_of_range("The index is out of range!");
+        throw out_of_range("Некорректный индекс!");
     }
     return (*this->list)[index];
 }
@@ -145,6 +155,56 @@ Sequence<T>* ListSequence<T>::Concat(Sequence<T> *other) {
         newSequence->Append(other->Get(i));
     }
     return newSequence;
+}
+
+template <typename T>
+template <typename U>
+Sequence<U>* ListSequence<T>::Map(function<U(T)> func) {
+    ListSequence<U> *sequence = new ListSequence<U>();
+    for (int i = 0; i < this->GetLength(); i++) {
+        sequence->Append(func(this->Get(i)));
+    }
+    return sequence;
+}
+
+template <typename T>
+Sequence<T>* ListSequence<T>::Where(function<bool(T)> func) {
+    ListSequence<T> *sequence = new ListSequence<T>();
+    for (int i = 0; i < this->GetLength(); i++) {
+        if (func(this->Get(i))) sequence->Append(this->Get(i));
+    }
+    return sequence;
+}
+
+template <typename T>
+T ListSequence<T>::Reduce(function<T(T, T)> func, T start) {
+    for (int i = 0; i < this->GetLength(); i++) {
+        start = func(start, this->Get(i));
+    }
+    return start;
+}
+
+template <typename T>
+template <typename U>
+Sequence<pair<T, U>>* ListSequence<T>::Zip(Sequence<U> *other) {
+    ListSequence<pair<T, U>> *sequence = new ListSequence<pair<T, U>>();
+    for (int i = 0; i < min(this->GetLength(), other->GetLength()); i++) {
+        sequence->Append(make_pair(this->Get(i), other->Get(i)));
+    }
+    return sequence;
+}
+
+template <typename T>
+template <typename U>
+pair<Sequence<T>*, Sequence<U>*> ListSequence<T>::Unzip(Sequence<pair<T, U>> *sequence) {
+    ListSequence<T> *first = new ListSequence<T>();
+    ListSequence<U> *second = new ListSequence<U>();
+    for (int i = 0; i < sequence->GetLength(); i++) {
+        auto pair = sequence->Get(i);
+        first->Append(pair.first);
+        second->Append(pair.second);
+    }
+    return make_pair(first, second);
 }
 
 

@@ -1,31 +1,31 @@
 #ifndef DYNAMICARRAY_HPP
 #define DYNAMICARRAY_HPP
 
-using namespace std;
-
 
 template <typename T>
 class DynamicArray {
     private:
         T* data;
-        int size;
+        size_t size;
     public:
         // Создание объекта
         DynamicArray();
         ~DynamicArray();
-        DynamicArray(int size);
-        DynamicArray(T* items, int count);
+        DynamicArray(size_t size);
+        DynamicArray(T* items, size_t count);
         DynamicArray(const DynamicArray<T> &dynamicArray);
 
         // Декомпозиция
-        int GetSize() const;
-        T Get(int index) const;
-        T& operator[](int index);
-        const T& operator[](int index) const;
+        size_t GetSize() const;
+        T Get(size_t index) const;
+
+        // Перегрузка операторов
+        T& operator[](size_t index);
+        const T& operator[](size_t index) const;
         
         // Операции
-        void Set(int index, T value);
-        void Resize(int newSize);
+        void Set(size_t index, T value);
+        void Resize(size_t newSize);
 };
 
 // Создание объекта
@@ -41,7 +41,7 @@ DynamicArray<T>::~DynamicArray() {
 }
 
 template <typename T>
-DynamicArray<T>::DynamicArray(int size): DynamicArray<T>::DynamicArray() {
+DynamicArray<T>::DynamicArray(size_t size): DynamicArray<T>::DynamicArray() {
     if (size > 0) {
         this->size = size;
         this->data = new T[size];
@@ -49,11 +49,11 @@ DynamicArray<T>::DynamicArray(int size): DynamicArray<T>::DynamicArray() {
 }
 
 template <typename T>
-DynamicArray<T>::DynamicArray(T* items, int count) {
+DynamicArray<T>::DynamicArray(T* items, size_t count) {
     this->size = count;
     this->data = new T[count];
     if (count != 0) {
-        for (int i = 0; i < count; i++) {
+        for (size_t i = 0; i < count; i++) {
             this->data[i] = items[i];
         }
     }
@@ -64,7 +64,7 @@ DynamicArray<T>::DynamicArray(const DynamicArray<T> &dynamicArray) {
     this->size = dynamicArray.size;
     this->data = new T[dynamicArray.size];
     if (dynamicArray.size != 0) {
-        for (int i = 0; i < dynamicArray.size; i++) {
+        for (size_t i = 0; i < dynamicArray.size; i++) {
             this->data[i] = dynamicArray.data[i];
         }
     }
@@ -72,48 +72,49 @@ DynamicArray<T>::DynamicArray(const DynamicArray<T> &dynamicArray) {
 
 // Декомпозиция
 template <typename T>
-int DynamicArray<T>::GetSize() const {
+size_t DynamicArray<T>::GetSize() const {
     return this->size;
 }
 
 template <typename T>
-T DynamicArray<T>::Get(int index) const {
-    if (index >= this->size || index < 0) {
-        throw out_of_range("Некорректный индекс!");
+T DynamicArray<T>::Get(size_t index) const {
+    if (index >= this->size) {
+        throw std::out_of_range("Некорректный индекс!");
     }
     return this->data[index];
 }
 
+// Перегрузка операторов
 template <typename T>
-T& DynamicArray<T>::operator[](int index) {
-    if (index >= this->size || index < 0) {
-        throw out_of_range("Некорректный индекс!");
+T& DynamicArray<T>::operator[](size_t index) {
+    if (index >= this->size) {
+        throw std::out_of_range("Некорректный индекс!");
     }
     return data[index];
 }
 
 template <typename T>
-const T& DynamicArray<T>::operator[](int index) const {
-    if (index >= this->size || index < 0) {
-        throw out_of_range("Некорректный индекс!");
+const T& DynamicArray<T>::operator[](size_t index) const {
+    if (index >= this->size) {
+        throw std::out_of_range("Некорректный индекс!");
     }
     return data[index];
 }
 
 // Операции
 template <typename T>
-void DynamicArray<T>::Set(int index, T value) {
-    if (index >= this->size || index < 0) {
-        throw out_of_range("Некорректный индекс!");
+void DynamicArray<T>::Set(size_t index, T value) {
+    if (index >= this->size) {
+        throw std::out_of_range("Некорректный индекс!");
     } else {
         this->data[index] = value;
     }
 }
 
 template <typename T>
-void DynamicArray<T>::Resize(int newSize) {
+void DynamicArray<T>::Resize(size_t newSize) {
     T* newData = new T[newSize];
-    for (int i = 0; i <= min(newSize, this->size); i++) {
+    for (size_t i = 0; i <= std::min(newSize, this->size); i++) {
         newData[i] = this->data[i];
     }
     delete[] this->data;

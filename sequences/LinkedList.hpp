@@ -1,8 +1,6 @@
 #ifndef LINKEDLIST_HPP
 #define LINKEDLIST_HPP
 
-using namespace std;
-
 
 template <typename T>
 class List {
@@ -15,36 +13,37 @@ class List {
         }
 };
 
-
 template <typename T>
 class LinkedList {
     private:
         friend class List<T>; 
         List<T> *start, *end;
-        int size;
+        size_t size;
     public:
         // Создание объекта
         LinkedList();
         ~LinkedList();
-        LinkedList(T* items, int count);
+        LinkedList(T* items, size_t count);
         LinkedList(const LinkedList<T> &other);
 
         // Декомпозиция
-        int GetLength() const;
+        size_t GetLength() const;
+        T Get(size_t index) const;
         T GetFirst() const;
         T GetLast() const;
-        T Get(int index) const;
-        T& operator[](int index);
-        const T& operator[](int index) const;
-        LinkedList<T>* GetSubList(int startIndex, int endIndex) const;
+
+        // Перегрузка операторов
+        T& operator[](size_t index);
+        const T& operator[](size_t index) const;
 
         // Операции
         void Append(T item);
         void Prepend(T item);
-        void Remove(int index);
-        void InsertAt(T item, int index);
-        void PutAt(T item, int index);
+        void Remove(size_t index);
+        void InsertAt(T item, size_t index);
+        void PutAt(T item, size_t index);
         LinkedList<T>* Concat(LinkedList<T> *other);
+        LinkedList<T>* GetSubList(size_t startIndex, size_t endIndex);
 };
 
 // Создание объекта
@@ -67,8 +66,8 @@ LinkedList<T>::~LinkedList() {
 }
 
 template <typename T>
-LinkedList<T>::LinkedList(T* items, int count): LinkedList<T>::LinkedList() {
-    for (int i = 0; i < count; i++) {
+LinkedList<T>::LinkedList(T* items, size_t count): LinkedList<T>::LinkedList() {
+    for (size_t i = 0; i < count; i++) {
         LinkedList<T>::Append(items[i]);
     }
 }
@@ -84,14 +83,26 @@ LinkedList<T>::LinkedList(const LinkedList<T> &other): LinkedList<T>::LinkedList
 
 // Декомпозиция
 template <typename T>
-int LinkedList<T>::GetLength() const {
+size_t LinkedList<T>::GetLength() const {
     return this->size;
+}
+
+template <typename T>
+T LinkedList<T>::Get(size_t index) const {
+    if (index >= this->size) {
+        throw std::out_of_range("Некорректный индекс!");
+    }
+    List<T> *p = this->start;
+    for (size_t i = 0; i < index; i++) {
+        p = p->next;
+    }
+    return p->data;
 }
 
 template <typename T>
 T LinkedList<T>::GetFirst() const {
     if (this->start == nullptr) {
-        throw out_of_range("Некорректный индекс!");
+        throw std::out_of_range("Некорректный индекс!");
     }
     return this->start->data;
 }
@@ -99,61 +110,34 @@ T LinkedList<T>::GetFirst() const {
 template <typename T>
 T LinkedList<T>::GetLast() const {
     if (this->end == nullptr) {
-        throw out_of_range("Некорректный индекс!");
+        throw std::out_of_range("Некорректный индекс!");
     }
     return this->end->data;
 }
 
+// Перегрузка операторов
 template <typename T>
-T LinkedList<T>::Get(int index) const {
-    if (index >= this->size || index < 0) {
-        throw out_of_range("Некорректный индекс!");
+T& LinkedList<T>::operator[](size_t index) {
+    if (index >= this->size) {
+        throw std::out_of_range("Некорректный индекс!");
     }
     List<T> *p = this->start;
-    for (int i = 0; i < index; i++) {
+    for (size_t i = 0; i < index; i++) {
         p = p->next;
     }
     return p->data;
 }
 
 template <typename T>
-T& LinkedList<T>::operator[](int index) {
-    if (index >= this->size || index < 0) {
-        throw out_of_range("Некорректный индекс!");
+const T& LinkedList<T>::operator[](size_t index) const {
+    if (index >= this->size) {
+        throw std::out_of_range("Некорректный индекс!");
     }
     List<T> *p = this->start;
-    for (int i = 0; i < index; i++) {
+    for (size_t i = 0; i < index; i++) {
         p = p->next;
     }
     return p->data;
-}
-
-template <typename T>
-const T& LinkedList<T>::operator[](int index) const {
-    if (index >= this->size || index < 0) {
-        throw out_of_range("Некорректный индекс!");
-    }
-    List<T> *p = this->start;
-    for (int i = 0; i < index; i++) {
-        p = p->next;
-    }
-    return p->data;
-}
-
-template <typename T>
-LinkedList<T>* LinkedList<T>::GetSubList(int startIndex, int endIndex) const {
-    if (endIndex >= this->size || startIndex < 0 || endIndex < startIndex) {
-        throw out_of_range("Некорректный индекс!");
-    }
-    LinkedList<T>* newList = new LinkedList<T>();
-    List<T> *p = this->start;
-    for (int i = 0; i <= endIndex; i++) {
-        if (i >= startIndex) {
-            newList->Append(p->data);
-        }
-        p = p->next;
-    }
-    return newList;
 }
 
 // Операции
@@ -182,15 +166,15 @@ void LinkedList<T>::Prepend(T item) {
 }
 
 template <typename T>
-void LinkedList<T>::Remove(int index) {
-    if (index >= this->size || index < 0) {
-        throw out_of_range("Некорректный индекс!");
+void LinkedList<T>::Remove(size_t index) {
+    if (index >= this->size) {
+        throw std::out_of_range("Некорректный индекс!");
     }
     List<T> *p = this->start;
     if (index == 0) {
         this->start = p->next;
     } else {
-        for (int i = 0; i < index-1; i++) {
+        for (size_t i = 0; i < index-1; i++) {
             p = p->next;
         }
         p->next = p->next->next;
@@ -202,24 +186,24 @@ void LinkedList<T>::Remove(int index) {
 }
 
 template <typename T>
-void LinkedList<T>::InsertAt(T item, int index) {
-    if (index >= this->size || index < 0) {
-        throw out_of_range("Некорректный индекс!");
+void LinkedList<T>::InsertAt(T item, size_t index) {
+    if (index >= this->size) {
+        throw std::out_of_range("Некорректный индекс!");
     }
     List<T> *p = this->start;
-    for (int i = 0; i < index; i++) {
+    for (size_t i = 0; i < index; i++) {
         p = p->next;
     }
     p->data = item;
 }
 
 template <typename T>
-void LinkedList<T>::PutAt(T item, int index) {
-    if (index >= this->size || index < 0) {
-        throw out_of_range("Некорректный индекс!");
+void LinkedList<T>::PutAt(T item, size_t index) {
+    if (index >= this->size) {
+        throw std::out_of_range("Некорректный индекс!");
     }
     List<T> *p = this->start;
-    for (int i = 0; i < index-1; i++) {
+    for (size_t i = 0; i < index-1; i++) {
         p = p->next;
     }
     List<T> *k = new List<T>(item);
@@ -236,6 +220,22 @@ LinkedList<T>* LinkedList<T>::Concat(LinkedList<T>* other) {
         p = p->next;
     }
     return this;
+}
+
+template <typename T>
+LinkedList<T>* LinkedList<T>::GetSubList(size_t startIndex, size_t endIndex) {
+    if (endIndex >= this->size || endIndex < startIndex) {
+        throw std::out_of_range("Некорректный индекс!");
+    }
+    LinkedList<T>* newList = new LinkedList<T>();
+    List<T> *p = this->start;
+    for (size_t i = 0; i <= endIndex; i++) {
+        if (i >= startIndex) {
+            newList->Append(p->data);
+        }
+        p = p->next;
+    }
+    return newList;
 }
 
 #endif // LINKEDLIST_HPP

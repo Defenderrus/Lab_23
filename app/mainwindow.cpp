@@ -159,7 +159,7 @@ void MainWindow::updatePlot() {
     series = new QLineSeries();
     bool flag = false;
     for (int i = 0; i < segmentFunction->GetSize(); i++) {
-        for (double x = segmentFunction->GetStart(i); x < segmentFunction->GetEnd(i); x+=step) {
+        for (double x = segmentFunction->Get(i).start; x < segmentFunction->Get(i).end; x+=step) {
             try {
                 double y = segmentFunction->CalculateAt(x);
                 if (isfinite(y)) {
